@@ -1,4 +1,4 @@
-title: Super
+title: Super Docs
 description: >- # this means to ignore newlines until "baseurl:"
   Documentation and guides for the Super, a Rails admin framework
 baseurl: "" # the subpath of your site, e.g. /blog
