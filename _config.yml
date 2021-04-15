@@ -14,3 +14,4 @@ exclude:
   - README.md
   - LICENSE.txt
   - tags
+  - bin/*
