@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+require "fileutils"
+
+if ARGV.size != 1 || (ARGV.first && ARGV.first !~ /\Av\d+(\.\d+)+\z/)
+  puts(<<~USAGE)
+    usage: #{$0} [version]
+
+    example: #{$0} v1.2.3
+  USAGE
+  exit 1
+end
+
+matches = Dir["v*/index.md"].sort
+if matches.any? { |math| math.start_with?("#{ARGV.first}/") }
+  puts "directory already exists: #{ARGV.first}"
+  exit 1
+end
+
+latest = matches.last
+previous_latest_version = File.dirname(latest)
+FileUtils.cp_r(previous_latest_version, ARGV.first)
+Dir["#{ARGV.first}/**/*.md"].each do |file|
+  contents = File.read(file).sub(/#{previous_latest_version}/, "#{ARGV.first}")
+  File.write(file, contents)
+end
+
+matches.each do |file|
+  next if file.start_with?("#{ARGV.first}/")
+
+  contents = File.read(file).sub(/^nav_order: (\d+)$/) do |_match|
+    match = Regexp.last_match
+
+    "nav_order: #{match[1].to_i + 1}"
+  end
+
+  File.write(file, contents)
+end
+
+latest = matches.sort.last
