@@ -4,4 +4,4 @@ nav_order: 3
 ---
 # API reference
 
-You can see the API docs in the source code or at <https://rubydoc.info/gems/super/0.0.12>
+You can see the API docs in the source code or at <https://rubydoc.info/gems/super/0.0.14>
