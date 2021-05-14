@@ -12,25 +12,30 @@ if ARGV.size != 1 || (ARGV.first && ARGV.first !~ /\Av\d+(\.\d+)+\z/)
 end
 
 matches = Dir["v*/index.md"].sort
-if matches.any? { |math| math.start_with?("#{ARGV.first}/") }
-  puts "directory already exists: #{ARGV.first}"
+NEW_DIRNAME = ARGV.first
+NEW_VERSION = NEW_DIRNAME.sub("v", "")
+LATEST_DIRNAME = File.dirname(matches.last)
+LATEST_VERSION = LATEST_DIRNAME.sub("v", "")
+
+if matches.any? { |math| math.start_with?("#{NEW_DIRNAME}/") }
+  puts "directory already exists: #{NEW_DIRNAME}"
   exit 1
 end
 
-latest = matches.last
-previous_latest_version = File.dirname(latest)
-puts "== Copying `#{previous_latest_version}` to `#{ARGV.first}`"
-FileUtils.cp_r(previous_latest_version, ARGV.first)
-Dir["#{ARGV.first}/**/*.md"].each do |file|
-  contents = File.read(file).gsub(/#{previous_latest_version.sub("v", "")}/, "#{ARGV.first.sub("v", "")}")
+puts "== Copying `#{LATEST_DIRNAME}` to `#{NEW_DIRNAME}`"
+FileUtils.cp_r(LATEST_DIRNAME, NEW_DIRNAME)
 
+puts "== Updating copied files with new version number"
+Dir["#{NEW_DIRNAME}/**/*.md"].each do |file|
+  contents = File.read(file).gsub(/#{LATEST_DIRNAME.sub("v", "")}/, "#{NEW_DIRNAME.sub("v", "")}")
   File.write(file, contents)
 end
 
+puts "== Processing previous files"
 matches.each do |file|
-  next if file.start_with?("#{ARGV.first}/")
+  next if file.start_with?("#{NEW_DIRNAME}/")
 
-  puts "== Updating nav_order #{file}"
+  puts "   Updating nav_order #{file}"
   contents = File.read(file).sub(/^nav_order: (\d+)$/) do |_match|
     match = Regexp.last_match
 
@@ -41,6 +46,6 @@ matches.each do |file|
 end
 
 `git add .`
-`git commit --message="Copy #{latest} into #{ARGV.first}"`
+`git commit --message="Copy #{LATEST_DIRNAME} into #{NEW_DIRNAME}"`
 
 puts "== Done!"
