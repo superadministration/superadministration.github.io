@@ -40,4 +40,7 @@ matches.each do |file|
   File.write(file, contents)
 end
 
+`git add .`
+`git commit --message="Copy #{latest} into #{ARGV.first}"`
+
 puts "== Done!"
