@@ -22,16 +22,16 @@ previous_latest_version = File.dirname(latest)
 puts "== Copying `#{previous_latest_version}` to `#{ARGV.first}`"
 FileUtils.cp_r(previous_latest_version, ARGV.first)
 Dir["#{ARGV.first}/**/*.md"].each do |file|
-  contents = File.read(file).sub(/#{previous_latest_version}/, "#{ARGV.first}")
+  contents = File.read(file).gsub(/#{previous_latest_version.sub("v", "")}/, "#{ARGV.first.sub("v", "")}")
+
   File.write(file, contents)
 end
 
 matches.each do |file|
   next if file.start_with?("#{ARGV.first}/")
 
-  puts "== Processing #{file}"
+  puts "== Updating nav_order #{file}"
   contents = File.read(file).sub(/^nav_order: (\d+)$/) do |_match|
-    puts "   Updating nav_order"
     match = Regexp.last_match
 
     "nav_order: #{match[1].to_i + 1}"
