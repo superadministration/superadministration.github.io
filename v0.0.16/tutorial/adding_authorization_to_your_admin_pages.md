@@ -1,7 +1,7 @@
 ---
 parent: Tutorial
 grand_parent: Super v0.0.16
-nav_order: 6
+nav_order: 7
 ---
 # Adding authorization to your admin pages
 
