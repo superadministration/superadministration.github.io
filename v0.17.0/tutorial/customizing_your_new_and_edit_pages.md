@@ -47,7 +47,7 @@ def form_schema
     customers = Customer.all.map do |c|
       [c.id, c.name]
     end
-    f[:customer_id] = type.select(collection: customers)
+    f[:customer_id] = type.select(customers)
     f[:price_cents] = type.text_field
   end
 end
