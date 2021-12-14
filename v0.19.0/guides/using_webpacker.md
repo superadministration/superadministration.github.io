@@ -1,7 +1,7 @@
 ---
 parent: Guides
 grand_parent: Super v0.19.0
-nav_order: 2
+nav_order: 3
 ---
 # Using Webpacker instead of Sprockets
 
