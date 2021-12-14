@@ -7,24 +7,11 @@ nav_order: 3
 
 Super defaults to using Sprockets and using Webpacker only when necessary.
 
-It's also possible to configure Super to use Webpacker exclusively. **I do not
-recommend this since it's slower, harder to use, and prints warnings.** But it's
-supported and totally possible to do if you want to or if you need to.
+It's also possible to configure Super to use Webpacker exclusively. To do so,
+run the following:
 
-You'll first need to set up Webpacker to handle ERB templates.
-
-After installing Super, run one the following:
-
-## Webpacker 4 and 5
+## Webpacker 4, 5, and 6
 
 ```bash
-bundle exec rails webpacker:install:erb # if you haven't already
-bundle exec rails generate super:webpacker
-```
-
-## Webpacker 6
-
-```bash
-yarn add rails-erb-loader # if you haven't already
 bundle exec rails generate super:webpacker
 ```
