@@ -5,8 +5,6 @@ nav_order: 3
 ---
 # Creating default admin pages
 
-## Using the generator
-
 Super comes with generators for generating admin routes and controllers.
 
 ```sh
@@ -16,6 +14,13 @@ bin/rails g super:resource product
 That'll update the routes file and generate a controller file like below:
 
 ```ruby
+# config/routes.rb
+Rails.application.routes.draw do
+  namespace :admin do
+    resources :products
+  end
+end
+
 # app/controllers/admin/products_controller.rb
 class Admin::ProductsController < AdminController
   private
@@ -24,35 +29,17 @@ class Admin::ProductsController < AdminController
     Product
   end
 end
-
-# config/routes.rb
-Rails.application.routes.draw do
-  namespace :admin do
-    resources :products
-  end
-end
 ```
 
-Before we continue, we'll create the rest of the admin pages too.
+Let's create two more using the generator.
 
 ```sh
 bin/rails g super:resource customer
-bin/rails g super:resource receipt
+bin/rails g super:resource orders
 ```
 
-Let's start the rails server and navigate to <http://localhost:3000/admin/products> and see what the defaults look like.
+Start the rails server and navigate to <http://localhost:3000/admin/products> and see what the defaults look like.
 
-The index view:
-
-![](/screenshots/0-0-12/products_default_index.png)
-
-The show view:
-
-![](/screenshots/0-0-12/products_default_show.png)
-
-The edit view:
-
-![](/screenshots/0-0-12/products_default_edit.png)
 
 ## The generated routes
 
@@ -63,8 +50,8 @@ While we're here, let's also change the order of the resources. By default, Supe
 ```ruby
 Rails.application.routes.draw do
   namespace :admin do
+    resources :orders
     resources :customers
-    resources :receipts
     resources :products
 
     root to: redirect(path: "/admin/customers", status: 302)

@@ -23,5 +23,4 @@ Next, you'll need to add a config file and some of the base files by running thi
 bin/rails generate super:install
 ```
 
-The default configuration makes a few safe assumptions, but it is configurable.
-See [installation guide](../guides/installation_options.md) to learn more.
+The default configuration makes a few assumptions, but it is configurable. See [installation guide](../guides/installation_options.md) to learn more.
