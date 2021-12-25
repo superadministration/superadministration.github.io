@@ -39,7 +39,7 @@ end
 
 class Product < ApplicationRecord
   validates :name, presence: true
-  validates :total_cents, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :price_cents, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
 end
 
 class Order < ApplicationRecord
