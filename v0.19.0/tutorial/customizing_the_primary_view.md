@@ -15,6 +15,12 @@ The method `#display_schema` returns an instance of `Super::Display`. By default
 Let's start at the very beginning. Add this method to your controller (I usually define it as a `private` method), then save and reload.
 
 ```ruby
+private
+
+def model
+  Product
+end
+
 def display_schema
   Super::Display.new do |f, type|
   end
@@ -41,6 +47,8 @@ def display_schema
   end
 end
 ```
+
+### Using unsupported display types
 
 It's a little unnatural to show prices in cents; here where I live, we usually communicate in dollars. So let's try formatting this a bit differently.
 
@@ -93,10 +101,98 @@ Note that this is just Ruby, so if you define a method like `#current_admin`, yo
 
 ## Customizing the `#new` and `#edit` views
 
-But it isn't always true! For example, the `#current_action` will claim to be "edit" in the `#update` action when called within the `#form_schema` method.
+The `#form_schema` method returns an instance of `Super::Form`.
 
-## Customizing which actions are visible
+Again, let's start with an empty form.
+
+```ruby
+private
+
+def model
+  Order
+end
+
+def form_schema
+  Super::Form.new do |f, type|
+  end
+end
+```
+
+The form `type`s match fairly closely to what you might be used to with Rails' `form_for` methods. Here's an example.
+
+```ruby
+def form_schema
+  Super::Form.new do |f, type|
+    f[:customer_id] = type.text_field
+    # In a `form_for`, the above line would probably look like:
+    # f.text_field :customer_id
+  end
+end
+```
+
+It's not very convenient to type in the customer IDs every time though.
+
+```ruby
+def form_schema
+  customers = Customer.all.map do |c|
+    [c.id, c.name]
+  end
+
+  Super::Form.new do |f, type|
+    f[:customer_id] = type.select(customers)
+  end
+end
+```
+
+### Forms with nested attributes
+
+Let's make it so that we can edit order lines from within the order. These should look pretty similar to 
+
+```ruby
+def form_schema
+  customers = Customer.all.map do |c|
+    [c.id, c.name]
+  end
+  products = Product.all.map do |p|
+    [p.id, p.name]
+  end
+
+  Super::Form.new do |f, type|
+    f[:customer_id] = type.select(customers)
+    f[:order_lines_attributes] = type.has_many do |g|
+      g[:product_id] = type.select(products)
+      g[:_destroy] = type._destroy
+    end
+  end
+end
+```
+
+In addition to `type.has_many`, there's also `type.has_one` and `type.belongs_to`.
+
+### Using unsupported form fields
+
+You have two options here.
+
+* `type.direct(:text_field, super_method: true)`
+    * The first argument denotes which form builder method to call.
+    * The `super_method` keyword:
+        * When `true`, calls the Super builder (e.g. `f.super.text_field`)
+        * When `false`, calls the default builder (e.g. `f.text_field`)
+    * Any additional arguments and keyword arguments gets passed directly to the form builder method
+* `type.partial("partial")` lets you use a custom partial
+    * The partial defines the variable `form`, which is the yielded value of Rails' `form_for`
+    * You can place partials under `app/views/admin/#{your_resource}/_#{partial}.html_erb`
 
 
-## Customizing actions behavior
+### Having different edit and new forms
 
+Here we can use `current_action.new?` and `current_action.edit?`.
+
+But `current_action` isn't always true! For example, the `#current_action` will claim to be "edit" in the `#update` action when called within the `#form_schema` method. (The same thing happens in the `#create` action.)
+
+This is for convenience, so that you don't need to check `current_action.new? || current_action.create?`.
+
+
+### Customizing strong parameters
+
+You shouldn't have to customize this behavior at all. Super can figure out strong parameters by allowing all of the form fields that are specified as the key `f[$this_part]`. This also works in conjunction with nested attributes.
