@@ -35,7 +35,7 @@ Let's create two more using the generator.
 
 ```sh
 bin/rails g super:resource customer
-bin/rails g super:resource orders
+bin/rails g super:resource order
 ```
 
 Start the rails server and navigate to <http://localhost:3000/admin/products> and see what the defaults look like.
@@ -54,7 +54,7 @@ Rails.application.routes.draw do
     resources :customers
     resources :products
 
-    root to: redirect(path: "/admin/customers", status: 302)
+    root to: redirect(path: "/admin/orders", status: 302)
   end
 end
 ```

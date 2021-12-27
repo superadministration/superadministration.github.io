@@ -57,7 +57,7 @@ def display_schema
   Super::Display.new do |f, type|
     f[:id] = type.batch
     f[:name] = type.string
-    f[:price_cents] = type.real(:value) { |val| val = val.to_s.rjust(3, "0"); "$#{val[0..-3]}.#{val[-2..-1]}" }
+    f[:price_cents] = type.real(:column) { |val| val = val.to_s.rjust(3, "0"); "$#{val[0..-3]}.#{val[-2..-1]}" }
   end
 end
 ```
@@ -65,7 +65,7 @@ end
 Super provides two escape hatches here, `type.real` and `type.computed`. You can use `type.real` only for attributes that are ActiveRecord database columns; these are automatically used as sortable columns. You can use `type.computed` in any other circumstance, and these will not be used as database columns.
 
 * These methods accept three different symbols:
-    * `:value` yields only the value of the method
+    * `:column` yields only the value of the method
     * `:record` yields the entire record. You'll have to call the method yourself
     * `:none` yields nothing
 * These methods can return any `String` or `Super::Partial`
@@ -82,7 +82,7 @@ def display_schema
   Super::Display.new do |f, type|
     f[:id] = type.batch
     f[:name] = type.string
-    f[:price_cents] = type.real(:value) { |val| val = val.to_s.rjust(3, "0") ; "$#{val[0..-3]}.#{val[-2..-1]}" }
+    f[:price_cents] = type.real(:column) { |val| val = val.to_s.rjust(3, "0") ; "$#{val[0..-3]}.#{val[-2..-1]}" }
     if current_action.show?
       f[:order_lines_quantity] = type.computed(:record) { |record| record.order_lines.size }
     end
@@ -135,7 +135,7 @@ It's not very convenient to type in the customer IDs every time though.
 ```ruby
 def form_schema
   customers = Customer.all.map do |c|
-    [c.id, c.name]
+    [c.name, c.id]
   end
 
   Super::Form.new do |f, type|
@@ -151,15 +151,15 @@ Let's make it so that we can edit order lines from within the order. These shoul
 ```ruby
 def form_schema
   customers = Customer.all.map do |c|
-    [c.id, c.name]
+    [c.name, c.id]
   end
   products = Product.all.map do |p|
-    [p.id, p.name]
+    [p.name, p.id]
   end
 
   Super::Form.new do |f, type|
     f[:customer_id] = type.select(customers)
-    f[:order_lines_attributes] = type.has_many do |g|
+    f[:order_lines_attributes] = type.has_many(:order_lines) do |g|
       g[:product_id] = type.select(products)
       g[:_destroy] = type._destroy
     end

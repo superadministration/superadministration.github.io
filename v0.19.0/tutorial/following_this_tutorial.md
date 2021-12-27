@@ -45,10 +45,12 @@ end
 class Order < ApplicationRecord
   belongs_to :customer
   has_many :order_lines, dependent: :destroy
+  has_many :products, through: :order_lines
+  accepts_nested_attributes_for :order_lines, reject_if: -> (attrs) { attrs["product_id"].blank? }
 end
 
 class OrderLine < ApplicationRecord
-  belongs_to :order_line
+  belongs_to :order
   belongs_to :product
 end
 ```
@@ -57,6 +59,7 @@ Let's create some fake data using the Rails console.
 
 ```ruby
 # bin/rails console
+srand 139
 ActiveRecord::Base.transaction do
   calculator = Product.create!(name: "Graphing calculator", price_cents: 100_00)
   cheeseburger = Product.create!(name: "Cheeseburger", price_cents: 6_00)
@@ -66,17 +69,19 @@ ActiveRecord::Base.transaction do
   products = [calculator, cheeseburger, magazine, sneakers, tote]
 
   (1..1000).each do |i|
+    puts "Creating Customers #{i} to #{i + 99}" if i % 100 == 1
     name = %w[Alice Bob Carol Dan][i % 4]
     Customer.create!(name: "#{name} #{i}")
   end
 
-  Customer.find_each do |customer|
+  Customer.order(:id).find_each do |customer|
+    puts "Creating Orders for Customers #{customer.id} to #{customer.id + 99}" if customer.id % 100 == 1
     number_of_orders = rand(1..3)
     number_of_orders.times do
       order = customer.orders.build
-      order_products = products.sample(1..products.size)
+      order_products = products.sample(rand(1..products.size))
       order_products.each do |product|
-        order.order_items.build(product: product)
+        order.order_lines.build(product: product)
       end
       order.save!
     end
