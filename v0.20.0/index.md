@@ -1,8 +1,8 @@
 ---
 has_children: true
-nav_order: 10
+nav_order: 2
 ---
-# Super v0.0.12
+# Super v0.20.0
 
 Super's documentation is split up into three parts:
 
