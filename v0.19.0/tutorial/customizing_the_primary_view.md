@@ -181,7 +181,7 @@ You have two options here.
     * Any additional arguments and keyword arguments gets passed directly to the form builder method
 * `type.partial("partial")` lets you use a custom partial
     * The partial defines the variable `form`, which is the yielded value of Rails' `form_for`
-    * You can place partials under `app/views/admin/#{your_resource}/_#{partial}.html_erb`
+    * You can place partials under `app/views/admin/#{your_resource}/_#{partial}.html.erb`
 
 
 ### Having different edit and new forms
