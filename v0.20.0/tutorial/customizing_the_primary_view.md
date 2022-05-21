@@ -99,6 +99,38 @@ Showing a field on only the `#index` page is similar too, you can check for `cur
 Note that this is just Ruby, so if you define a method like `#current_admin`, you can show some fields to some users while hiding it for others. You can customize this however you wish!
 
 
+### Using `Super::Badge`
+
+You can specify "badges" or "pills" by returning an instance of `Super::Badge`.
+
+```ruby
+def display_schema
+  Super::Display.new do |f, type|
+    f[:id] = type.batch
+    f[:status] = type.computed(:record) do |record|
+      if record.updated_at == record.created_at
+        Super::Badge.new("Never updated", styles: :green)
+      elsif record.updated_at > record.created_at
+        Super::Badge.new("Updated", styles: :yellow)
+      else
+        Super::Badge.new("Invalid update", styles: :red)
+      end
+    end
+  end
+end
+```
+
+The full list of styles are:
+
+* `light`
+* `dark`
+* `red`
+* `yellow`
+* `green`
+* `blue`
+* `purple`
+
+
 ## Customizing the `#new` and `#edit` views
 
 The `#form_schema` method returns an instance of `Super::Form`.
@@ -146,7 +178,7 @@ end
 
 ### Forms with nested attributes
 
-Let's make it so that we can edit order lines from within the order. These should look pretty similar to 
+Let's make it so that we can edit order lines from within the order.
 
 ```ruby
 def form_schema
